@@ -1,0 +1,48 @@
+<?php
+
+// $id$
+
+/**
+ * @file collection.install
+ * Contains install and update functions for collection.
+ */
+
+/**
+ * Implementation of hook_schema().
+ */
+function collection_schema() {
+  $schema['collection_backref'] = array(
+    'description' => t('Contains back references from node ref field on collection nodes.'),
+    'fields' => array(
+      'nid' => array(
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+      'collection_nid' => array(
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+    ),
+    'indexes' => array(
+      'nid' => array('nid'),
+      'collection_nid' => array('collection_nid'),
+    ),
+  );
+  return $schema;
+}
+
+/**
+ * Implementation of hook_install().
+ */
+function collection_install() {
+  drupal_install_schema('collection');
+}
+
+/**
+ * Implementation of hook_uninstall().
+ */
+function collection_uninstall() {
+  drupal_uninstall_schema('collection');
+}
