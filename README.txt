@@ -23,6 +23,8 @@ FEATURES
 * Provides a block that lists the other nodes part of the same
   collections.
 
+* Uses custom build_modes, allowing for custom CCK field display settings.
+
 * Theming friendly blocks.
 
 USAGE
