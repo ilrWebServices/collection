@@ -14,10 +14,16 @@
 
 /**
  * $node->build_mode is set to this when building collection for block
- * display. Makes it easy for node.tpl.php (or its overrides) to
- * change the appearance of collections in blocks.
+ * display. Makes it easy for node.tpl.php (or its overrides) to change the
+ * appearance of collections in blocks. Also allows CCK to make the display of
+ * fields configurable.
  */
 define('NODE_BUILD_COLLECTION', 100);
+/**
+ * $node->build_mode is set to this for nodes listed, allowing for
+ * customisation through CCKs interface and custom node.tpl.php handling.
+ */
+define('NODE_BUILD_COLLECTION_LIST', 101);
 
 /**
  * Implementation of hook_menu().
@@ -73,9 +79,11 @@ function collection_form_node_type_form_alter(&$form, &$form_state) {
 
   $fields = array(NULL => t('Not a collection'));
   $content_type = content_types($type);
-  foreach ($content_type['fields'] as $name => $field) {
-    if ($field['type'] == 'nodereference') {
-      $fields[$field['field_name']] = t($field['widget']['label']);
+  if ($content_type) {
+    foreach ($content_type['fields'] as $name => $field) {
+      if ($field['type'] == 'nodereference') {
+        $fields[$field['field_name']] = t($field['widget']['label']);
+      }
     }
   }
   
@@ -147,6 +155,7 @@ function collection_block($op, $delta = 0, $edit = array()) {
               $nodes = array();
               foreach ($collection->{collection_field_name($collection->type)} as $delta => $cnode) {
                 if ($cnode = node_load($cnode['nid'])) {
+                  $cnode->build_mode = NODE_BUILD_COLLECTION_LIST;
                   $nodes[] = node_view($cnode, TRUE);
                 }
               }
@@ -173,6 +182,27 @@ function collection_theme() {
       'arguments' => array('nodes' => array(), 'collection' => NULL, 'node' => NULL),
     ),
   );
+}
+
+/**
+ * Implementation of hook_content_build_modes().
+ */
+function collection_content_build_modes() {
+ return array(
+   'collection' => array(
+     'title' => t('Collection'),
+     'build modes' => array(
+       NODE_BUILD_COLLECTION => array(
+         'title' => t('Collections block'),
+         'views style' => FALSE,
+       ),
+       NODE_BUILD_COLLECTION_LIST => array(
+         'title' => t('Collection article listing block'),
+         'views style' => FALSE,
+       ),
+     ),
+   ),
+ );
 }
 
 // --- Theming functions ---
