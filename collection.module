@@ -305,7 +305,7 @@ function _collection_batch($type, &$context) {
     $context['sandbox']['progress']++;
     $context['sandbox']['current_node'] = $node->nid;
     $context['message'] = $node->title;
-    // collection_update_backrefs($node);
+    collection_update_backrefs($node);
   }
   if ($context['sandbox']['progress'] != $context['sandbox']['max']) {
     $context['finished'] = $context['sandbox']['progress'] / $context['sandbox']['max'];
