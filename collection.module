@@ -155,8 +155,10 @@ function collection_block($op, $delta = 0, $edit = array()) {
               $nodes = array();
               foreach ($collection->{collection_field_name($collection->type)} as $delta => $cnode) {
                 if ($cnode = node_load($cnode['nid'])) {
-                  $cnode->build_mode = NODE_BUILD_COLLECTION_LIST;
-                  $nodes[] = node_view($cnode, TRUE);
+                  if ($cnode->status == 1 and node_access('view', $cnode)) {
+                    $cnode->build_mode = NODE_BUILD_COLLECTION_LIST;
+                    $nodes[] = node_view($cnode, TRUE);
+                  }
                 }
               }
               $content .= theme('collection_node_list', $nodes, $collection, $node);
@@ -248,8 +250,10 @@ function collection_nodes($node) {
   while ($row = db_fetch_object($result)) {
     // Filter out any missing nodes (they could be deleted).
     if ($n = node_load($row->collection_nid)) {
-      $n->collection_weight = 0;
-      $nodes[] = $n;
+      if ($node->status == 1 and node_access('view', $node)) {
+        $n->collection_weight = 0;
+        $nodes[] = $n;
+      }
     }
   }
   // Allow modules to alter the collection.
