@@ -79,7 +79,7 @@ function collection_form_node_type_form_alter(&$form, &$form_state) {
 
   $fields = array(NULL => t('Not a collection'));
   $content_type = content_types($type);
-  if ($content_type) {
+  if ($content_type['fields']) {
     foreach ($content_type['fields'] as $name => $field) {
       if ($field['type'] == 'nodereference') {
         $fields[$field['field_name']] = t($field['widget']['label']);
