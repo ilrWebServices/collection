@@ -230,6 +230,29 @@ function collection_in_collection() {
   return NULL;
 }
 
+/**
+ * Helper function that returns collection_nid's that node is member of 
+ * 
+ * @param $nid
+ *   ID of node
+ * @return
+ *   FALSE if node isn't a menber of any collections
+ *   Or an array of collection ID's - array($collection_nid [, $collection_nid])
+ */
+function collection_get_collections_by_node($nid) {
+  $node_ids = array();
+  
+  $result = db_query('SELECT collection_nid FROM {collection_backref} WHERE nid = %d ORDER BY collection_nid', $nid);
+  while ($row = db_fetch_object($result)) {
+    $node_ids[] = $row->collection_nid;
+  }
+  if (!empty($node_ids)) {
+    return $node_ids; 
+  }
+  else {
+    return FALSE;
+  }
+}
 
 /**
  * Returns the node reference field for the collection type.
