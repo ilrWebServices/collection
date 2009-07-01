@@ -207,6 +207,18 @@ function collection_content_build_modes() {
  );
 }
 
+// --- CTools support ---
+/**
+ * Implementation of hook_ctools_plugin_directory().
+ *
+ * Tells CTools where to look for plugin code.
+ */
+function collection_ctools_plugin_directory($module, $plugin) {
+  if ($module == 'ctools' && $plugin == 'relationships') {
+    return 'plugins/' . $plugin;
+  }
+}
+
 // --- Theming functions ---
 
 /**
