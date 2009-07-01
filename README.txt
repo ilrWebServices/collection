@@ -27,6 +27,10 @@ FEATURES
 
 * Theming friendly blocks.
 
+* CTools relationship to fetch the first collection node as
+  context. Allows Panels 3 to use the collection node, which opens up
+  for many possibilities.
+
 USAGE
 =====
 
