@@ -156,44 +156,23 @@ function collection_block($op, $delta = 0, $edit = array()) {
           // Show a listing of the collections this node is part of, when viewing
           // a node in a collection.
           if ($node = collection_in_collection()) {
-            foreach ($node->collections as $collection_node) {
-              // $node->collection_hidden allows modules to suppress the display of some collection nodes.
-              if (!isset($node->collection_hidden) or !$node->collection_hidden and
-                  $node->status == 1 and node_access('view', $node)) {
-                $collection_node->build_mode = NODE_BUILD_COLLECTION;
-                $content .= node_view($collection_node, $teaser, FALSE, $links);
-              }
-            }
             return array(
               'subject' => t('Collection listing'),
-              'content' => $content,
+              'content' => collection_collection_listing($node, $teaser, $links),
             );           
           }
           break;
         case 1:
-          // Show a listing of the nodes in the same collection, when viewing
-          // a node in a collection.
+          // Show a listing of the nodes in the same collection (its
+          // siblings), when viewing a node in a collection.
           if ($node = collection_in_collection()) {
-            foreach ($node->collections as $collection) {
-              $nodes = array();
-              foreach ($collection->{collection_field_name($collection->type)} as $delta => $cnode) {
-                if ($cnode = node_load($cnode['nid'])) {
-                  if ($cnode->status == 1 and node_access('view', $cnode)) {
-                    $cnode->build_mode = NODE_BUILD_COLLECTION_LIST;
-                    $nodes[] = node_view($cnode, $teaser, FALSE, $links);
-                  }
-                }
-              }
-              $content .= theme('collection_node_list', $nodes, $collection, $node);
-            }
             return array(
-              'subject' => t('In same collection(s)'),
-              'content' => $content,
+              'subject' => t('Collection siblings'),
+              'content' => collection_sibling_listing($node, $teaser, $links),
             );           
           }
           break;
       }
-
       break;
   }
 }
@@ -237,7 +216,7 @@ function collection_content_build_modes() {
  * Tells CTools where to look for plugin code.
  */
 function collection_ctools_plugin_directory($module, $plugin) {
-  if ($module == 'ctools' && $plugin == 'relationships') {
+  if ($module == 'ctools' && ($plugin == 'relationships' || $plugin == 'content_types')) {
     return 'plugins/' . $plugin;
   }
 }
@@ -253,6 +232,48 @@ function theme_collection_node_list($nodes, $collection, $node) {
 
 
 // --- Misc. functions ---
+
+/**
+ * Renders a nodes collections.
+ */
+function collection_collection_listing($node, $teaser, $links) {
+  $content = "";
+  foreach ($node->collections as $collection_node) {
+    // In the case when the collection block/pane is shown more than
+    // once on the pane, things go haywire when the node is rendered
+    // the second time. we have to rerender, as we can't be sure that
+    // the $teaser and $links settings are the same. So we start out
+    // by cloning so we don't change the original.
+    $collection_node = drupal_clone($collection_node);
+    // $node->collection_hidden allows modules to suppress the display of some collection nodes.
+    if (!isset($node->collection_hidden) or !$node->collection_hidden and
+        $node->status == 1 and node_access('view', $node)) {
+      $collection_node->build_mode = NODE_BUILD_COLLECTION;
+      $content .= node_view($collection_node, $teaser, FALSE, $links);
+    }
+  }
+  return $content;
+}
+
+/**
+ * Renders a nodes siblings.
+ */
+function collection_sibling_listing($node, $teaser, $links) {
+  $content = "";
+  foreach ($node->collections as $collection) {
+    $nodes = array();
+    foreach ($collection->{collection_field_name($collection->type)} as $delta => $cnode) {
+      if ($cnode = node_load($cnode['nid'])) {
+        if ($cnode->status == 1 and node_access('view', $cnode)) {
+          $cnode->build_mode = NODE_BUILD_COLLECTION_LIST;
+          $nodes[] = node_view($cnode, $teaser, FALSE, $links);
+        }
+      }
+    }
+    $content .= theme('collection_node_list', $nodes, $collection, $node);
+  }
+  return $content;
+}
 
 /**
  * Helper function to figure out if we're looking at a node that's part of a

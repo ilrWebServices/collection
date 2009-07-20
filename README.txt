@@ -23,6 +23,9 @@ FEATURES
 * Provides a block that lists the other nodes part of the same
   collections.
 
+* CTools content_types variations of the 2 blocks, which takes a node
+  context instead of trying to guess the node from the URL.
+
 * Uses custom build_modes, allowing for custom CCK field display settings.
 
 * Theming friendly blocks.
@@ -43,18 +46,18 @@ Under Collection settings on the content type form, select the node
 reference field and save the content type.
 
 Now you may go to Administer > Build > Blocks and enable the
-"Collection listing" and "In same collection(s)" blocks if you like.
+"Collection listing" and "Collection siblings" blocks if you like.
 
 The display of the collection nodes in the "Collection listing" block
 may be customised using the usual node.tpl.php (or one of it's
 overrides) template. The template may check that $node->build_mode ==
 NODE_BUILD_COLLECTION to determine when the node is rendered in the
-block.
+block. Same goes for "Collection siblings" and NODE_BUILD_COLLECTION_LIST.
 
 Modules may change the ordering of collections in the block by
 implementing hook_collection_alter($nodes, $node) (where $nodes is an
 array of the collections and $node is the node in question), and
-setting $collection->collection_weight to alter the order, and
+setting $collection->collection_weight to alter the order, or
 $collection->collection_hidden to completely hide a given collection.
 
 AUTHOR / MAINTAINER
