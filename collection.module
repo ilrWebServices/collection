@@ -178,6 +178,14 @@ function collection_block($op, $delta = 0, $edit = array()) {
 }
 
 /**
+ * Implementation of hook_ctools_block_info().
+ */
+function collection_ctools_block_info($module, $delta, &$info) {
+  // Hide the regular blocks from CTools as our own content_types does it better.
+  $info = NULL;
+}
+
+/**
  * Implementation of hook_theme().
  */
 function collection_theme() {
