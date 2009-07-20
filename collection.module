@@ -128,17 +128,40 @@ function collection_block($op, $delta = 0, $edit = array()) {
         ),
       );
       break;
+    case 'configure':
+      $form['teaser'] = array(
+        '#title' => t('Teaser'),
+        '#type' => 'checkbox',
+        '#default_value' => variable_get('collection_block_teaser_' . $delta, TRUE),
+        '#description' => t('Check here to show only the node teaser.'),
+      );
+
+      $form['links'] = array(
+        '#type' => 'checkbox',
+        '#default_value' => variable_get('collection_block_links_' . $delta, FALSE),
+        '#title' => t('Display links'),
+        '#description' => t('Check here to display the links with the post.'),
+      );
+      return $form;
+      break;
+    case 'save':
+      variable_set('collection_block_teaser_' . $delta, $edit['teaser']);
+      variable_set('collection_block_links_' . $delta, $edit['links']);
+      break;
     case 'view':
+      $teaser = variable_get('collection_block_teaser_' . $delta, TRUE);
+      $links = variable_get('collection_block_links_' . $delta, FALSE);
       switch ($delta) {
         case 0:
-          // Show a listing of the nodes in the same collection, when viewing
+          // Show a listing of the collections this node is part of, when viewing
           // a node in a collection.
           if ($node = collection_in_collection()) {
             foreach ($node->collections as $collection_node) {
               // $node->collection_hidden allows modules to suppress the display of some collection nodes.
-              if (!isset($node->collection_hidden) or !$node->collection_hidden) {
+              if (!isset($node->collection_hidden) or !$node->collection_hidden and
+                  $node->status == 1 and node_access('view', $node)) {
                 $collection_node->build_mode = NODE_BUILD_COLLECTION;
-                $content .= node_view($collection_node);
+                $content .= node_view($collection_node, $teaser, FALSE, $links);
               }
             }
             return array(
@@ -157,7 +180,7 @@ function collection_block($op, $delta = 0, $edit = array()) {
                 if ($cnode = node_load($cnode['nid'])) {
                   if ($cnode->status == 1 and node_access('view', $cnode)) {
                     $cnode->build_mode = NODE_BUILD_COLLECTION_LIST;
-                    $nodes[] = node_view($cnode, TRUE);
+                    $nodes[] = node_view($cnode, $teaser, FALSE, $links);
                   }
                 }
               }
