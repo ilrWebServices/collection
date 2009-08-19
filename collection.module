@@ -319,6 +319,9 @@ function collection_nodes($node) {
   $nids = collection_get_collections_by_node($node->nid);
   if ($nids) {
     foreach ($nids as $nid) {
+      if ($node->nid == $nid) {
+        continue;
+      }
       // Check node_access, as we're likely to 'view' the node.
       $n = node_load($nid);
       if (node_access('view', $n)) {
