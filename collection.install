@@ -45,4 +45,12 @@ function collection_install() {
  */
 function collection_uninstall() {
   drupal_uninstall_schema('collection');
+  db_query("DELETE FROM {variable} WHERE name LIKE 'collection_%'");
+}
+
+/**
+ * Delete the collection_backref table, as it is not used anymore.
+ */
+function collection_update_6001() {
+  drupal_uninstall_schema('collection');
 }
