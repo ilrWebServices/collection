@@ -264,7 +264,8 @@ function collection_in_collection() {
  */
 function collection_types($reset = FALSE) {
   static $collection_types;
-  if (!$collection_types || $reset) {
+  if (!is_array($collection_types) || $reset) {
+    $collection_types = array();
     foreach (content_types() as $type_name => $type) {
       if ($field_name = collection_field_name($type_name)) {
         $db_info = content_database_info($type['fields'][$field_name]);
