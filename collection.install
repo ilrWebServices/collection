@@ -52,5 +52,6 @@ function collection_uninstall() {
  * Delete the collection_backref table, as it is not used anymore.
  */
 function collection_update_6001() {
-  drupal_uninstall_schema('collection');
+  $ret = array();
+  $ret[] = drupal_uninstall_schema('collection');
 }
