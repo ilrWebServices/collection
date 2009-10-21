@@ -288,11 +288,19 @@ function collection_types($reset = FALSE) {
  *   Or an array of collection ID's - array($collection_nid [, $collection_nid])
  */
 function collection_get_collections_by_node($nid) {
+  global $user;
   $node_ids = array();
   
   foreach (collection_types() as $node_type => $db_info) {
     list($table_name, $column_name) = $db_info;
-    $result = db_query('SELECT n.nid FROM {' . $table_name . '} JOIN {node} n USING (nid, vid) WHERE ' . $column_name . ' = %d AND status = 1 ORDER BY n.nid', $nid);
+    $args = array($nid);
+    if (!user_access('administer nodes')) {
+      $where =  "AND (status = 1 OR uid = %d)";
+      $args[] = $user->uid;
+    }
+
+    $result = db_query('SELECT n.nid FROM {' . $table_name . '} JOIN {node} n USING (nid, vid) WHERE ' . $column_name . ' = %d ' . $where . ' ORDER BY n.nid', $args);
+
     while ($row = db_fetch_object($result)) {
       $node_ids[] = $row->nid;
     }
