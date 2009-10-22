@@ -233,15 +233,18 @@ function collection_sibling_listing($node, $teaser, $links) {
   $content = "";
   foreach ($node->collections as $collection) {
     $nodes = array();
-    foreach ($collection->{collection_field_name($collection->type)} as $delta => $cnode) {
-      if ($cnode = node_load($cnode['nid'])) {
-        if ($cnode->status == 1 and node_access('view', $cnode)) {
-          $cnode->build_mode = NODE_BUILD_COLLECTION_LIST;
-          $nodes[] = node_view($cnode, $teaser, FALSE, $links);
+    $field_name = collection_field_name($collection->type);
+    if ($field_name) {
+      foreach ($collection->$field_name as $delta => $cnode) {
+        if ($cnode = node_load($cnode['nid'])) {
+          if ($cnode->status == 1 and node_access('view', $cnode)) {
+            $cnode->build_mode = NODE_BUILD_COLLECTION_LIST;
+            $nodes[] = node_view($cnode, $teaser, FALSE, $links);
+          }
         }
       }
+      $content .= theme('collection_node_list', $nodes, $collection, $node);
     }
-    $content .= theme('collection_node_list', $nodes, $collection, $node);
   }
   return $content;
 }
@@ -293,13 +296,13 @@ function collection_get_collections_by_node($nid) {
   
   foreach (collection_types() as $node_type => $db_info) {
     list($table_name, $column_name) = $db_info;
-    $args = array($nid);
+    $args = array($nid, $node_type);
     if (!user_access('administer nodes')) {
       $where =  "AND (status = 1 OR uid = %d)";
       $args[] = $user->uid;
     }
 
-    $result = db_query('SELECT n.nid FROM {' . $table_name . '} JOIN {node} n USING (nid, vid) WHERE ' . $column_name . ' = %d ' . $where . ' ORDER BY n.nid', $args);
+    $result = db_query('SELECT n.nid FROM {' . $table_name . '} JOIN {node} n USING (nid, vid) WHERE ' . $column_name . ' = %d AND type = "%s" ' . $where . ' ORDER BY n.nid', $args);
 
     while ($row = db_fetch_object($result)) {
       $node_ids[] = $row->nid;
