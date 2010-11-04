@@ -1,9 +1,9 @@
 <?php
 
-// $id$
+// $Id$
 
 /**
- * @file collection.install
+ * @file
  * Contains install and update functions for collection.
  */
 

@@ -1,11 +1,11 @@
-<?php // $Id$
+<?php
+
+// $Id$
 
 /**
- * @file collection.inc
- *
+ * @file
  * Provides collection content_types to modules implementing the
  * content_types plugin (panels being the major one).
- *
  */
 
 /**
@@ -66,7 +66,7 @@ function collection_collection_content_type_render($subtype, $conf, $panel_args,
   $block->module = 'collection';
   $block->delta = $node->nid;
 
-  switch($subtype) {
+  switch ($subtype) {
     case 'collections':
       $block->title = t('Collection listing');
       $block->content = collection_collection_listing($node, $conf['teaser'], $conf['links'], $conf['title_only']);
@@ -122,7 +122,7 @@ function collection_collection_content_type_edit_form_submit(&$form, &$form_stat
  * Return the pane titles.
  */
 function collection_collection_content_type_admin_title($subtype, $conf, $context) {
-  switch($subtype) {
+  switch ($subtype) {
 
     case 'collections':
       return t('Collections for "@title"', array('@title' => $context->identifier));

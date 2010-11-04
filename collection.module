@@ -172,21 +172,21 @@ function collection_theme() {
  * Implementation of hook_content_build_modes().
  */
 function collection_content_build_modes() {
- return array(
-   'collection' => array(
-     'title' => t('Collection'),
-     'build modes' => array(
-       NODE_BUILD_COLLECTION => array(
-         'title' => t('Collections block'),
-         'views style' => FALSE,
-       ),
-       NODE_BUILD_COLLECTION_LIST => array(
-         'title' => t('Collection article listing block'),
-         'views style' => FALSE,
-       ),
-     ),
-   ),
- );
+  return array(
+    'collection' => array(
+      'title' => t('Collection'),
+      'build modes' => array(
+        NODE_BUILD_COLLECTION => array(
+          'title' => t('Collections block'),
+          'views style' => FALSE,
+        ),
+        NODE_BUILD_COLLECTION_LIST => array(
+          'title' => t('Collection article listing block'),
+          'views style' => FALSE,
+        ),
+      ),
+    ),
+  );
 }
 
 // --- CTools support ---
