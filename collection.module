@@ -57,7 +57,7 @@ function collection_form_node_type_form_alter(&$form, &$form_state) {
       }
     }
   }
-  
+
   $form['collection'] = array(
     '#type' => 'fieldset',
     '#title' => t('Collection settings'),
@@ -87,11 +87,18 @@ function collection_block($op, $delta = 0, $edit = array()) {
         ),
         1 => array(
           'info' => t('In same collection(s)'),
-          'cache' => BLOCK_CACHE_PER_PAGE,                    
+          'cache' => BLOCK_CACHE_PER_PAGE,
         ),
       );
       break;
     case 'configure':
+      $form['title_only'] = array(
+        '#title' => t('Title only'),
+        '#type' => 'checkbox',
+        '#default_value' => variable_get('collection_block_title_only_' . $delta, FALSE),
+        '#description' => t('Display the title as a link only, overrides settings below.'),
+      );
+
       $form['teaser'] = array(
         '#title' => t('Teaser'),
         '#type' => 'checkbox',
@@ -110,10 +117,12 @@ function collection_block($op, $delta = 0, $edit = array()) {
     case 'save':
       variable_set('collection_block_teaser_' . $delta, $edit['teaser']);
       variable_set('collection_block_links_' . $delta, $edit['links']);
+      variable_set('collection_block_title_only_' . $delta, $edit['title_only']);
       break;
     case 'view':
       $teaser = variable_get('collection_block_teaser_' . $delta, TRUE);
       $links = variable_get('collection_block_links_' . $delta, FALSE);
+      $title_only = variable_get('collection_block_title_only_' . $delta, FALSE);
       switch ($delta) {
         case 0:
           // Show a listing of the collections this node is part of, when viewing
@@ -121,8 +130,8 @@ function collection_block($op, $delta = 0, $edit = array()) {
           if ($node = collection_in_collection()) {
             return array(
               'subject' => t('Collection listing'),
-              'content' => collection_collection_listing($node, $teaser, $links),
-            );           
+              'content' => collection_collection_listing($node, $teaser, $links, $title_only),
+            );
           }
           break;
         case 1:
@@ -131,8 +140,8 @@ function collection_block($op, $delta = 0, $edit = array()) {
           if ($node = collection_in_collection()) {
             return array(
               'subject' => t('Collection siblings'),
-              'content' => collection_sibling_listing($node, $teaser, $links),
-            );           
+              'content' => collection_sibling_listing($node, $teaser, $links, $title_only),
+            );
           }
           break;
       }
@@ -154,7 +163,7 @@ function collection_ctools_block_info($module, $delta, &$info) {
 function collection_theme() {
   return array(
     'collection_node_list' => array(
-      'arguments' => array('nodes' => array(), 'collection' => NULL, 'node' => NULL),
+      'arguments' => array('nodes' => array(), 'collection' => NULL, 'node' => NULL, 'title_only' => FALSE),
     ),
   );
 }
@@ -195,9 +204,12 @@ function collection_ctools_plugin_directory($module, $plugin) {
 // --- Theming functions ---
 
 /**
- * Theme the listing of related nodes in the "In same collection(s)" block.
+ * Theme the listing of related nodes in the "Collection siblings" block.
  */
-function theme_collection_node_list($nodes, $collection, $node) {
+function theme_collection_node_list($nodes, $collection, $node, $title_only) {
+  if ($title_only) {
+    return theme('item_list', $nodes);
+  }
   return join('', $nodes);
 }
 
@@ -207,7 +219,7 @@ function theme_collection_node_list($nodes, $collection, $node) {
 /**
  * Renders a nodes collections.
  */
-function collection_collection_listing($node, $teaser, $links) {
+function collection_collection_listing($node, $teaser, $links, $title_only) {
   $content = "";
   foreach ($node->collections as $collection_node) {
     // In the case when the collection block/pane is shown more than
@@ -220,7 +232,7 @@ function collection_collection_listing($node, $teaser, $links) {
     if (!isset($node->collection_hidden) or !$node->collection_hidden and
         $node->status == 1 and node_access('view', $node)) {
       $collection_node->build_mode = NODE_BUILD_COLLECTION;
-      $content .= node_view($collection_node, $teaser, FALSE, $links);
+      $content .= _collection_render_node($collection_node, $teaser, $links, $title_only);
     }
   }
   return $content;
@@ -229,7 +241,7 @@ function collection_collection_listing($node, $teaser, $links) {
 /**
  * Renders a nodes siblings.
  */
-function collection_sibling_listing($node, $teaser, $links) {
+function collection_sibling_listing($node, $teaser, $links, $title_only) {
   $content = "";
   foreach ($node->collections as $collection) {
     $nodes = array();
@@ -239,11 +251,11 @@ function collection_sibling_listing($node, $teaser, $links) {
         if ($cnode = node_load($cnode['nid'])) {
           if ($cnode->status == 1 and node_access('view', $cnode)) {
             $cnode->build_mode = NODE_BUILD_COLLECTION_LIST;
-            $nodes[] = node_view($cnode, $teaser, FALSE, $links);
+            $nodes[] = _collection_render_node($cnode, $teaser, $links, $title_only);
           }
         }
       }
-      $content .= theme('collection_node_list', $nodes, $collection, $node);
+      $content .= theme('collection_node_list', $nodes, $collection, $node, $title_only);
     }
   }
   return $content;
@@ -251,7 +263,7 @@ function collection_sibling_listing($node, $teaser, $links) {
 
 /**
  * Helper function to figure out if we're looking at a node that's part of a
- * collection. 
+ * collection.
  */
 function collection_in_collection() {
   if ($node = menu_get_object() and $node->collections) {
@@ -282,8 +294,8 @@ function collection_types($reset = FALSE) {
 
 
 /**
- * Helper function that returns collection_nid's that node is member of 
- * 
+ * Helper function that returns collection_nid's that node is member of
+ *
  * @param $nid
  *   ID of node
  * @return
@@ -293,7 +305,7 @@ function collection_types($reset = FALSE) {
 function collection_get_collections_by_node($nid) {
   global $user;
   $node_ids = array();
-  
+
   foreach (collection_types() as $node_type => $db_info) {
     list($table_name, $column_name) = $db_info;
     $args = array($nid, $node_type);
@@ -309,7 +321,7 @@ function collection_get_collections_by_node($nid) {
     }
   }
   if (!empty($node_ids)) {
-    return $node_ids; 
+    return $node_ids;
   }
   else {
     return FALSE;
@@ -349,6 +361,18 @@ function collection_nodes($node) {
 }
 
 /**
+ * Render node for a list.
+ */
+function _collection_render_node($node, $teaser, $links, $title_only) {
+  if ($title_only) {
+    return l($node->title, 'node/' . $node->nid);
+  }
+  else {
+    return node_view($node, $teaser, FALSE, $links);
+  }
+}
+
+/**
  * Helper for uasort to sort collections by weight.
  */
 function _collection_sort($a, $b) {
@@ -358,5 +382,5 @@ function _collection_sort($a, $b) {
     }
     return ($a->title < $b->title) ? -1 : 1;
   }
-  return ($a->collection_weight < $b->collection_weight) ? -1 : 1;  
+  return ($a->collection_weight < $b->collection_weight) ? -1 : 1;
 }
