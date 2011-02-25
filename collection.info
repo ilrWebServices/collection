@@ -1,4 +1,3 @@
-; $Id$
 name = Collection
 package = "CCK"
 description = "Allows administrators to define collection nodes, which groups multiple nodes together."
