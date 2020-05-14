@@ -1,56 +1,23 @@
 <?php
 
-
 /**
  * @file
- * Contains install and update functions for collection.
+ * Installation hooks for the Collection module.
  */
 
-/**
- * Implementation of hook_schema().
- */
-function collection_schema() {
-  $schema['collection_backref'] = array(
-    'description' => t('Contains back references from node ref field on collection nodes.'),
-    'fields' => array(
-      'nid' => array(
-        'type' => 'int',
-        'unsigned' => TRUE,
-        'not null' => TRUE,
-      ),
-      'collection_nid' => array(
-        'type' => 'int',
-        'unsigned' => TRUE,
-        'not null' => TRUE,
-      ),
-    ),
-    'indexes' => array(
-      'nid' => array('nid'),
-      'collection_nid' => array('collection_nid'),
-    ),
-  );
-  return $schema;
-}
+use Drupal\Core\Field\BaseFieldDefinition;
 
 /**
- * Implementation of hook_install().
+ * Add weight field.
  */
-function collection_install() {
-  drupal_install_schema('collection');
-}
+function collection_update_8001() {
+  $field_storage_definition = BaseFieldDefinition::create('integer')
+    ->setLabel(t('Weight'))
+    ->setSetting('unsigned', FALSE)
+    ->setSetting('size', 'normal')
+    ->setInitialValue(0)
+    ->setDefaultValue(0);
 
-/**
- * Implementation of hook_uninstall().
- */
-function collection_uninstall() {
-  drupal_uninstall_schema('collection');
-  db_query("DELETE FROM {variable} WHERE name LIKE 'collection_%'");
-}
-
-/**
- * Delete the collection_backref table, as it is not used anymore.
- */
-function collection_update_6001() {
-  $ret = array();
-  $ret[] = drupal_uninstall_schema('collection');
+  \Drupal::entityDefinitionUpdateManager()
+    ->installFieldStorageDefinition('weight', 'collection_item', 'collection_item', $field_storage_definition);
 }
