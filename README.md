@@ -1,6 +1,41 @@
 # Collection
 
-Organize any content or configuration entity into an arbitrary collection.
+## Introduction
+
+The Collection module allows users to organize any content or configuration entity into arbitrary collections.
+
+Examples include _blogs_ (collections of posts), _periodicals_ (collections of articles or stories), _subsites_ (collections of pages, along with a related menu, in a discreet section of the site) and _personal collections_ of content or configuration of interest to individual users.
+
+Multiple extension points, included events and hooks, allow developers to implement the specific requirements of their use cases.
+
+Collection has some similarities to the Group module (https://www.drupal.org/project/group), in that it uses Collection item entities as relation objects to join content and configuration to Collections. But Collection does not enable custom permissions and roles per collection, and Collection allows users to place configuration entities, such as menus, into collections.
+
+
+## Requirements
+
+This module requires the following modules:
+
+- dynamic_entity_reference (https://www.drupal.org/project/dynamic_entity_reference)
+- drupal:path
+- key_value_field (https://www.drupal.org/project/key_value_field)
+
+## Installation
+
+Install as you would normally install a contributed Drupal module. Visit https://www.drupal.org/node/1897420 for further information.
+
+## Configuration
+
+
+
+Collection types
+
+Collection item types
+
+Ownership (& seeing one's )
+
+Permissions
+
+
 
 ## Listings
 
