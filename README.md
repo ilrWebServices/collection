@@ -2,14 +2,20 @@
 
 ## Introduction
 
-The Collection module allows users to organize any content or configuration entity into arbitrary collections.
+The Collection module allows users to organize content or configuration entities in arbitrary collections.
 
-Examples include _blogs_ (collections of posts), _periodicals_ (collections of articles or stories), _subsites_ (collections of pages, along with a related menu, in a discreet section of the site) and _personal collections_ of content or configuration of interest to individual users.
+Examples include _blogs_ (collections of posts), _periodicals_ (collections of articles or stories), _subsites_ (collections of pages, along with a related menu, for a discreet section of the site) and _personal collections_ of content or configuration of interest to individual users.
 
-Multiple extension points, included events and hooks, allow developers to implement the specific requirements of their use cases.
+## Features
 
-Collection has some similarities to the Group module (https://www.drupal.org/project/group), in that it uses Collection item entities as relation objects to join content and configuration to Collections. But Collection does not enable custom permissions and roles per collection, and Collection allows users to place configuration entities, such as menus, into collections.
-
+- Fieldable, revisionable _Collection entities_, which can be used as content pages like nodes.
+- _Collection types_, similar to content types.
+- Fieldable _Collection item entities_, used to link content (or configuration) entities (e.g. nodes) to Collections.
+- _Collection item types_.
+- Ability to place content in multiple Collections, while designating one Collection as the canonical (or primary) Collection.
+- Ordering of items in Collections.
+- Collection item listings as Paragraphs (via the included, experimental Collection Listing module).
+- Multiple extension points (events and hooks) allowing developers to implement the specific requirements of their use cases.
 
 ## Requirements
 
@@ -19,46 +25,61 @@ This module requires the following modules:
 - drupal:path
 - key_value_field (https://www.drupal.org/project/key_value_field)
 
+## Optional modules
+
+- Inline entity form (https://www.drupal.org/project/inline_entity_form):  
+When enabled, Collection item forms will be embedded in content entity forms (e.g. node edit form) when that content is in a Collection.
+- Paragraphs (https://www.drupal.org/project/paragraphs):  
+When enabled along with the included Collection Listing module, users can create listings of the items in a given Collection for placement on another content entity.
+- Pathauto (https://www.drupal.org/project/pathauto):  
+When enabled along with the included Collection Pathauto module, the URL alias of the Collection will be prepended to the URL alias of the content items with the Collection.
+
 ## Installation
 
 Install as you would normally install a contributed Drupal module. Visit https://www.drupal.org/node/1897420 for further information.
 
 ## Configuration
 
+Create one or more _Collection types_ at Administration » Structure » Collection types. Some examples:
 
+- A `blog` collection type to represent multiple blogs.
+- A `personal` collection type to allow individual users to create arbitrary Collections in which to place content they wish to track.
 
-Collection types
+Configure the user permissions at Administration » People » Permissions:
 
-Collection item types
+- `Administer collections`  
+  Users with this permission can create and modify _Collection types_ and _Collection item types_.
 
-Ownership (& seeing one's )
+- `Access collection overview`  
+  Users with this permission can access the collection overview page.
 
-Permissions
+- `View`, `Create`, `Edit`, and `Delete` permissions  
+  Adjust these permissions as required. Some examples:
 
+    - For a `blog` collection type, you might allow anonymous users the `Blog: View collection` permission and give the `Edit own collections` permission to, for example, a `Blog Editor` role.
 
+    - For a `personal` collection type, you could give the following permissions to authenticated users: `Personal: Create new collection`, `Delete own collections`, `Edit own collections`, and `View own collections`.
 
-## Listings
+Note that edit and delete permissions are not per collection type, but based on individual Collection _ownership_. Unlike many other content entities, Collections can have multiple owners for finer-grain control.
 
-Currently, sites using the paragraphs module can create filtered listings of items in a collection. To enable this feature, simply add a collection entity reference field to a paragraph type, and then enable the collection listing behavior for that type.
+Optionally, create new _Collection item_ types at Administration » Structure » Collection item types. Collection items are fieldable and can be edited using the 'Edit collection item' operation on Collection item listings (the _Items_ tab on Collections). If _Inline entity form_ is enabled, the Collection item entity form will be embedded on the content entity edit form (e.g. the node edit form). It will use the `mini` form mode for Collection items if configured for that Collection item type.
 
-When adding a paragraph item of this type, there will be a new "Behaviors" tab in the UI that allows you to specify the content types, bundles and display modes to include when that listing is rendered, as well as the number of items.
+## Similar modules
 
-### Required Patches for Listings
-
-https://www.drupal.org/files/issues/core-patch-2915512-7.patch
-https://www.drupal.org/files/issues/2020-03-19/3120952-2.patch
+Collection has some similarities to the Group module (https://www.drupal.org/project/group), in that it uses Collection item entities as relation objects to join content/configuration to Collections. But Collection does not enable custom permissions and roles per Collection, and Collection allows users to place configuration entities, such as menus, into Collections.
 
 ## Roadmap
 
-- Customize DER allowed referenced per collection or collection item type. Research how node module allows base field overrides to be stored in separate config items. See https://drupal.stackexchange.com/questions/253257/how-to-easily-alter-an-entitys-base-field-definition-per-bundle
-- Implement user interface for adding items to collection (e.g. contextual links, custom block, node add/edit form).
-- Add 'in collection' condition and admin block (maybe).
+- Add tests.
+- Add example module for `blog` use case.
+- Customize allowed content and/or configuration entity types and bundles per collection item type. Research how node module allows base field overrides to be stored in separate config items. See https://drupal.stackexchange.com/questions/253257/how-to-easily-alter-an-entitys-base-field-definition-per-bundle
+- Add a drag and drop UI for Collection item weights.
+- Add a previous/next block, paragraph, and/or extra field to allow navigation of items in Collections according to their ordering by weight.
+- Improve interface for adding items to collection (e.g. contextual links, custom block, node add/edit form).
 - Implement exposed filters in the collection item listing. Investigate using Views as the listbuilder.
 - Allow bulk operations on collection item lists.
 - Fix Views integration.
-- Add collection item listing to collection pages.
 - Improve collection permissions
-  - per collection type add/edit/delete
+  - Per collection type add/edit/delete
 - Offer to remove collection items when deleting a collection
   - Or prevent deletion of collections with items
-- Add tests
