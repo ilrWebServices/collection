@@ -23,7 +23,6 @@ use Drupal\Core\Config\Entity\ConfigEntityBundleBase;
  *       "html" = "Drupal\Core\Entity\Routing\AdminHtmlRouteProvider",
  *     },
  *   },
- *   config_prefix = "collection_type",
  *   admin_permission = "administer site configuration",
  *   bundle_of = "collection",
  *   entity_keys = {
@@ -36,6 +35,12 @@ use Drupal\Core\Config\Entity\ConfigEntityBundleBase;
  *     "edit-form" = "/admin/structure/collection/{collection_type}",
  *     "delete-form" = "/admin/structure/collection/{collection_type}/delete",
  *     "collection" = "/admin/structure/collection"
+ *   },
+ *   config_prefix = "collection_type",
+ *   config_export = {
+ *     "id",
+ *     "label",
+ *     "allowed_collection_item_types",
  *   }
  * )
  */

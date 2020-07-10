@@ -36,6 +36,11 @@ use Drupal\Core\Config\Entity\ConfigEntityBundleBase;
  *     "edit-form" = "/admin/structure/collection_item/{collection_item_type}",
  *     "delete-form" = "/admin/structure/collection_item/{collection_item_type}/delete",
  *     "collection" = "/admin/structure/collection_item"
+ *   },
+ *   config_prefix = "collection_item_type",
+ *   config_export = {
+ *     "id",
+ *     "label",
  *   }
  * )
  */
