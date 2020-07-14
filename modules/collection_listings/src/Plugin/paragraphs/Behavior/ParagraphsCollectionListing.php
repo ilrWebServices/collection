@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\collection\Plugin\paragraphs\Behavior;
+namespace Drupal\collection_listings\Plugin\paragraphs\Behavior;
 
 use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
 use Drupal\Core\Form\FormStateInterface;
