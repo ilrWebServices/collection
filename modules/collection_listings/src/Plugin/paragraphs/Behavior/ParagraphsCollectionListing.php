@@ -165,6 +165,7 @@ class ParagraphsCollectionListing extends ParagraphsBehaviorBase {
         $query->range(0, $paragraph->getBehaviorSetting($this->getPluginId(), 'count'));
       }
 
+      $query->sort('weight');
       $result = $query->execute();
 
       foreach ($collection_item_storage->loadMultiple($result) as $collection_item) {
