@@ -89,13 +89,15 @@ class CollectionType extends ConfigEntityBundleBase implements CollectionTypeInt
         foreach ($allowed_collection_item_type->getAllowedBundles() as $entity_and_bundle) {
           list($allowed_entity_type_id, $allowed_bundle) = explode('.', $entity_and_bundle);
 
+          // If this collection item type is already allowed, don't check again.
+          if (in_array($allowed_collection_item_type_id, $allowed_collection_item_types)) {
+            continue;
+          }
+
           if ($entity_type_id && $bundle && $entity_type_id === $allowed_entity_type_id && $bundle === $allowed_bundle) {
             $allowed_collection_item_types[] = $allowed_collection_item_type_id;
           }
-          elseif ($entity_type_id && $entity_type_id === $allowed_entity_type_id) {
-            $allowed_collection_item_types[] = $allowed_collection_item_type_id;
-          }
-          elseif ($bundle === $allowed_bundle) {
+          elseif (!$bundle && $entity_type_id && $entity_type_id === $allowed_entity_type_id) {
             $allowed_collection_item_types[] = $allowed_collection_item_type_id;
           }
         }
