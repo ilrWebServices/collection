@@ -9,5 +9,11 @@ use Drupal\Core\Config\Entity\ConfigEntityInterface;
  */
 interface CollectionItemTypeInterface extends ConfigEntityInterface {
 
-  // Add get/set methods for your configuration properties here.
+  /**
+   * Get the allowed collection item types property.
+   *
+   * @return array
+   *   An array of allowed collection item types.
+   */
+  public function getAllowedBundles();
 }

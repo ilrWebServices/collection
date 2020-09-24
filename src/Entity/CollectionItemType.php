@@ -41,6 +41,7 @@ use Drupal\Core\Config\Entity\ConfigEntityBundleBase;
  *   config_export = {
  *     "id",
  *     "label",
+ *     "allowed_bundles",
  *   }
  * )
  */
@@ -59,4 +60,18 @@ class CollectionItemType extends ConfigEntityBundleBase implements CollectionIte
    * @var string
    */
   protected $label;
+
+  /**
+   * The Collection item allowed content entity bundles.
+   *
+   * @var array
+   */
+  protected $allowed_bundles = [];
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getAllowedBundles() {
+    return $this->allowed_bundles;
+  }
 }

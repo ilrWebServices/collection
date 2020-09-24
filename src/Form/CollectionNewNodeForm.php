@@ -64,22 +64,10 @@ class CollectionNewNodeForm extends FormBase {
    * {@inheritdoc}
    */
   public function buildForm(array $form, FormStateInterface $form_state, CollectionInterface $collection = NULL) {
-    $node_type_storage = $this->entityTypeManager->getStorage('node_type');
-    $content_type_options = [];
-
-    // Show only node types the user has access to.
-    foreach ($node_type_storage->loadMultiple() as $type) {
-      $access = $this->entityTypeManager->getAccessControlHandler('node')->createAccess($type->id(), NULL, [], TRUE);
-
-      if ($access->isAllowed()) {
-        $content_type_options[$type->id()] = $type->label();
-      }
-    }
-
     // Set the collection to which we are adding a node. This will be used in
     // the submit handler.
     $form_state->set('collection', $collection);
-    $form_state->set('collection_item_type', 'default');
+    $form_state->set('collection_item_type', '¯\_(ツ)_/¯');
 
     // Node label (e.g. title).
     $form['label'] = [
@@ -87,6 +75,9 @@ class CollectionNewNodeForm extends FormBase {
       '#title' => $this->t('Title'),
       '#required' => TRUE,
     ];
+
+    // Check the configuration for the allowed bundle options.
+    $content_type_options = $this->getBundleOptions($collection);
 
     // Node bundle (e.g. content type).
     $form['bundle'] = [
@@ -96,6 +87,14 @@ class CollectionNewNodeForm extends FormBase {
       '#default_value' => (count($content_type_options) === 1) ? array_keys($content_type_options)[0] : [],
       '#required' => TRUE,
     ];
+
+    if (empty($content_type_options)) {
+      $form['missing_bundle_message'] = [
+        '#markup' => t('<p>This %collection_type collection does not allow any content types. Please check the <em>Collection type</em> configuration.</p>', [
+          '%collection_type' => $collection->type->entity->label()
+        ]),
+      ];
+    }
 
     $form['submit'] = [
       '#type' => 'submit',
@@ -111,6 +110,7 @@ class CollectionNewNodeForm extends FormBase {
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
     $collection = $form_state->get('collection');
+    $collection_item_type = $form_state->get('collection_item_type');
     $node_storage = $this->entityTypeManager->getStorage('node');
     $collection_item_storage = $this->entityTypeManager->getStorage('collection_item');
 
@@ -131,9 +131,16 @@ class CollectionNewNodeForm extends FormBase {
       );
     }
 
+    // Check if the type was set in a presubmit hook. Othewise, use the first
+    // available option.
+    if ($collection_item_type === '¯\_(ツ)_/¯') {
+      $allowed_types = $collection->type->entity->getAllowedCollectionItemTypes('node', $node->bundle());
+      $collection_item_type = reset($allowed_types);
+    }
+
     // Add the node to this collection.
     $collection_item = $collection_item_storage->create([
-      'type' => $form_state->get('collection_item_type'),
+      'type' => $collection_item_type,
       'collection' => $collection,
       'item' => $node,
       'canonical' => TRUE,
@@ -162,6 +169,34 @@ class CollectionNewNodeForm extends FormBase {
     return $this->t('Add content to @collection', [
       '@collection' => $collection->label(),
     ]);
+  }
+
+  /**
+   * Checks the configuration for allowed bundles.
+   *
+   * @param CollectionInterface $collection
+   *
+   * @return array
+   *    An array of node bundles allowed in this collection, keyed by bundle
+   *    machine name with the label as the value
+   */
+  protected function getBundleOptions(CollectionInterface $collection) {
+    $bundle_options = [];
+    $allowed_bundles = $collection->type->entity->getAllowedEntityBundles('node');
+
+    if (empty($allowed_bundles['node'])) {
+      return $bundle_options;
+    }
+
+    foreach ($allowed_bundles['node'] as $bundle) {
+      $access = $this->entityTypeManager->getAccessControlHandler('node')->createAccess($bundle, NULL, [], TRUE);
+
+      if ($access->isAllowed()) {
+        $bundle_options[$bundle] = $this->entityTypeManager->getStorage('node_type')->load($bundle)->label();
+      }
+    }
+
+    return $bundle_options;
   }
 
 }

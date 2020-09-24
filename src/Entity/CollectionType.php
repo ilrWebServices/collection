@@ -70,8 +70,74 @@ class CollectionType extends ConfigEntityBundleBase implements CollectionTypeInt
   /**
    * {@inheritdoc}
    */
-  public function getAllowedCollectionItemTypes() {
-    return $this->allowed_collection_item_types;
+  public function getAllowedCollectionItemTypes($entity_type_id = NULL, $bundle = NULL) {
+    $allowed_collection_item_types = [];
+
+    if (!$entity_type_id && !$bundle) {
+      $allowed_collection_item_types = $this->allowed_collection_item_types;
+    }
+    else {
+      $collection_item_type_storage = \Drupal::service('entity_type.manager')->getStorage('collection_item_type');
+
+      foreach ($this->allowed_collection_item_types as $allowed_collection_item_type_id) {
+        $allowed_collection_item_type = $collection_item_type_storage->load($allowed_collection_item_type_id);
+
+        if (!$allowed_collection_item_type) {
+          continue;
+        }
+
+        foreach ($allowed_collection_item_type->getAllowedBundles() as $entity_and_bundle) {
+          list($allowed_entity_type_id, $allowed_bundle) = explode('.', $entity_and_bundle);
+
+          if ($entity_type_id && $bundle && $entity_type_id === $allowed_entity_type_id && $bundle === $allowed_bundle) {
+            $allowed_collection_item_types[] = $allowed_collection_item_type_id;
+          }
+          elseif ($entity_type_id && $entity_type_id === $allowed_entity_type_id) {
+            $allowed_collection_item_types[] = $allowed_collection_item_type_id;
+          }
+          elseif ($bundle === $allowed_bundle) {
+            $allowed_collection_item_types[] = $allowed_collection_item_type_id;
+          }
+        }
+      }
+    }
+
+    return $allowed_collection_item_types;
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function getAllowedEntityBundles($entity_type_id = NULL) {
+    $entity_bundles = [];
+    $collection_item_type_storage = \Drupal::service('entity_type.manager')->getStorage('collection_item_type');
+
+    foreach ($this->allowed_collection_item_types as $allowed_collection_item_type_id) {
+      $collection_item_type = $collection_item_type_storage->load($allowed_collection_item_type_id);
+
+      foreach ($collection_item_type->getAllowedBundles() as $entity_and_bundle) {
+        list($entity_type, $bundle_name) = explode('.', $entity_and_bundle);
+
+        if ($entity_type_id) {
+          if ($entity_type_id !== $entity_type) {
+            continue;
+          }
+
+          if (isset($entity_bundles[$entity_type])) {
+            if (!in_array($bundle_name, $entity_bundles[$entity_type])) {
+              $entity_bundles[$entity_type][$bundle_name] = $bundle_name;
+            }
+          }
+          else {
+            $entity_bundles[$entity_type][$bundle_name] = $bundle_name;
+          }
+        }
+        else {
+          $entity_bundles[$entity_type][$bundle_name] = $bundle_name;
+        }
+      }
+    }
+
+    return $entity_bundles;
+  }
 }
