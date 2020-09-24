@@ -131,7 +131,7 @@ class CollectionNewNodeForm extends FormBase {
       );
     }
 
-    // Check if the type was set in a presubmit hook. Othewise, use the first
+    // Check if the type was set in a presubmit hook. Otherwise, use the first
     // available option.
     if ($collection_item_type === '¯\_(ツ)_/¯') {
       $allowed_types = $collection->type->entity->getAllowedCollectionItemTypes('node', $node->bundle());
