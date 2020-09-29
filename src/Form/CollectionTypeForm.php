@@ -3,8 +3,10 @@
 namespace Drupal\collection\Form;
 
 use Drupal\Core\Entity\EntityForm;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
 
 /**
  * Class CollectionTypeForm.
@@ -12,11 +14,29 @@ use Drupal\Core\Entity\EntityInterface;
 class CollectionTypeForm extends EntityForm {
 
   /**
+   * The entity type bundle info manager.
+   *
+   * @var \Drupal\Core\Entity\EntityTypeBundleInfo
+   */
+  protected $setEntityTypeBundleInfoManager;
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container) {
+    $form = new static();
+    $form->setEntityTypeBundleInfoManager = $container->get('entity_type.bundle.info');
+    return $form;
+  }
+
+  /**
    * {@inheritdoc}
    */
   public function form(array $form, FormStateInterface $form_state) {
     $form = parent::form($form, $form_state);
     $collection_type = $this->entity;
+    $collection_item_type_storage = $this->entityTypeManager->getStorage('collection_item_type');
+    $bundle_info = $this->setEntityTypeBundleInfoManager->getAllBundleInfo();
     $allowed_collection_item_types = [];
 
     $form['label'] = [
@@ -36,8 +56,31 @@ class CollectionTypeForm extends EntityForm {
       '#disabled' => !$collection_type->isNew(),
     ];
 
-    foreach (\Drupal::service('entity_type.bundle.info')->getBundleInfo('collection_item') as $collection_item_type => $info) {
-      $allowed_collection_item_types[$collection_item_type] = $info['label'];
+    foreach ($collection_item_type_storage->loadMultiple() as $collection_item_type) {
+      $allowed_collection_item_types[$collection_item_type->id()] = $collection_item_type->label();
+      $allowed_content = [];
+
+      // Store the allowed bundles per entity type in a nested array.
+      foreach ($collection_item_type->getAllowedBundles() as $entity_and_bundle) {
+        list($entity_type_id, $bundle) = explode('.', $entity_and_bundle);
+        $entity_type_label = (string) $this->entityTypeManager->getDefinition($entity_type_id)->getLabel();
+        $allowed_content[$entity_type_label][] = $bundle_info[$entity_type_id][$bundle]['label'];
+      }
+
+      // Flatten the allowed bundles per entity type.
+      $allowed_content = array_map(function($v) {
+        return implode(', ', array_filter($v));
+      }, $allowed_content);
+
+      // Prepend the entity type label to the flattened bundles.
+      array_walk($allowed_content, function(&$v, $k) {
+        $v = '• <em>' . $k . ':</em> ' . $v;
+      });
+
+      // Flatten the list of entity types and allowed bundles into an array
+      // keyed by the collection item type. This will be used as descriptions
+      // for each checkbox.
+      $collection_item_allowed_content[$collection_item_type->id()] = implode('<br /> ', $allowed_content);
     }
 
     $form['allowed_collection_item_types'] = [
@@ -47,6 +90,12 @@ class CollectionTypeForm extends EntityForm {
       '#default_value' => $collection_type->getAllowedCollectionItemTypes(),
       '#required' => TRUE,
     ];
+
+    // Add descriptions for each option here. See
+    // https://www.drupal.org/project/drupal/issues/2779999
+    foreach (array_keys($allowed_collection_item_types) as $allowed_collection_item_type) {
+      $form['allowed_collection_item_types'][$allowed_collection_item_type]['#description'] = $collection_item_allowed_content[$allowed_collection_item_type];
+    }
 
     return $form;
   }
