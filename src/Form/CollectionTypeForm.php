@@ -81,6 +81,8 @@ class CollectionTypeForm extends EntityForm {
       // keyed by the collection item type. This will be used as descriptions
       // for each checkbox.
       $collection_item_allowed_content[$collection_item_type->id()] = implode('<br /> ', $allowed_content);
+
+      $collection_item_allowed_content[$collection_item_type->id()] .= '<br />' . $collection_item_type->toLink('edit', 'edit-form')->toString();
     }
 
     $form['allowed_collection_item_types'] = [
