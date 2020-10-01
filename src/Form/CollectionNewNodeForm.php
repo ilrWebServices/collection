@@ -90,8 +90,8 @@ class CollectionNewNodeForm extends FormBase {
 
     if (empty($content_type_options)) {
       $form['missing_bundle_message'] = [
-        '#markup' => t('<p>This %collection_type collection does not allow any content types. Please check the <em>Collection type</em> configuration.</p>', [
-          '%collection_type' => $collection->type->entity->label()
+        '#markup' => t('<p>This collection does not allow any content types. Please check the  %collection_type configuration.</p>', [
+          '%collection_type' => $collection->type->entity->toLink(NULL, 'edit-form')->toString()
         ]),
       ];
     }
