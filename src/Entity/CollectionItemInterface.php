@@ -92,4 +92,11 @@ interface CollectionItemInterface extends ContentEntityInterface, EntityChangedI
    */
   public function removeAttribute(string $key);
 
+  /**
+   * Get the `canonical` status of the item.
+   *
+   * @return boolean
+   *   TRUE if the item is the canonical version. FALSE if not.
+   */
+  public function isCanonical();
 }

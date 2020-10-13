@@ -238,6 +238,13 @@ class CollectionItem extends ContentEntityBase implements CollectionItemInterfac
   /**
    * {@inheritdoc}
    */
+  public function isCanonical() {
+    return $this->get('canonical')->value;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public static function baseFieldDefinitions(EntityTypeInterface $entity_type) {
     $fields = parent::baseFieldDefinitions($entity_type);
 
