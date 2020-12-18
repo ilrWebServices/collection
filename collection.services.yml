@@ -11,3 +11,6 @@ services:
   collection.content_entity_form.alter:
     class: Drupal\collection\CollectionContentEntityFormAlter
     arguments: ['@entity_type.manager', '@current_user', '@module_handler']
+  collection.content_manager:
+    class: Drupal\collection\CollectionContentManager
+    arguments: ['@entity_type.manager']
