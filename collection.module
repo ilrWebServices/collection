@@ -165,3 +165,33 @@ function collection_form_alter(&$form, FormStateInterface $form_state, $form_id)
     \Drupal::service('collection.content_entity_form.alter')->embedCollectionItems($form, $form_state, $form_object->getEntity());
   }
 }
+
+/**
+ * Implements hook_entity_operation().
+ *
+ * Add an operation link to edit the collection item entity.
+ */
+function collection_entity_operation(EntityInterface $entity) {
+  if ($entity->getEntityTypeId() == 'collection_item') {
+    $item_entity_type = ($entity->item->entity instanceof \Drupal\Core\Entity\ContentEntityInterface) ? 'content' : 'configuration';
+    $operations = [];
+    $operations['edit_item'] = [
+      'title' => t('Edit @entity_type', ['@entity_type' => $item_entity_type]),
+      'url' => $entity->item->entity->toUrl('edit-form'),
+      'weight' => -1,
+    ];
+    return $operations;
+  }
+}
+
+/**
+ * Implements hook_entity_operation_alter().
+ *
+ * Update the edit and delete operations titles for collection items.
+ */
+function collection_entity_operation_alter(array &$operations, EntityInterface $entity) {
+  if ($entity->getEntityTypeId() == 'collection_item') {
+    $operations['edit']['title'] = t('Edit collection item');
+    $operations['delete']['title'] = t('Remove from collection');
+  }
+}

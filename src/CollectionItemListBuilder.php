@@ -124,33 +124,6 @@ class CollectionItemListBuilder extends BulkFormEntityListBuilder {
 
   /**
    * {@inheritdoc}
-   */
-  public function buildOperations(EntityInterface $entity) {
-    $build = parent::buildOperations($entity);
-    $item_entity_type = ($entity->item->entity instanceof \Drupal\Core\Entity\ContentEntityInterface) ? 'content' : 'configuration';
-
-    // Add a link to edit the collection item referenced item.
-    $build['#links'] = array_merge([
-      'edit_item' => [
-        'title' => $this->t('Edit @entity_type', ['@entity_type' => $item_entity_type]),
-        'url' => $this->ensureDestination($entity->item->entity->toURL('edit-form')),
-        'weight' => -1,
-      ]
-    ], $build['#links']);
-
-    if (!empty($build['#links']['edit'])) {
-      // Rename the edit link title.
-      $build['#links']['edit']['title'] = $this->t('Edit collection item');
-    }
-    if (!empty($build['#links']['delete'])) {
-      // Rename the delete link title.
-      $build['#links']['delete']['title'] = $this->t('Remove from collection');
-    }
-    return $build;
-  }
-
-  /**
-   * {@inheritdoc}
    *
    * @see ModulesListForm::buildForm().
    */
