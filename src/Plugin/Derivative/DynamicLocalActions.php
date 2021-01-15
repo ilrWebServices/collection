@@ -29,7 +29,8 @@ class DynamicLocalActions extends DeriverBase {
       $this->derivatives[$local_action['id']]['title'] = $local_action['title'];
       $this->derivatives[$local_action['id']]['route_name'] = $local_action['route_name'];
       $this->derivatives[$local_action['id']]['appears_on'] = [
-        'entity.collection_item.collection'
+        'entity.collection_item.collection',
+        'view.collection_items.page_1',
       ];
     }
 
