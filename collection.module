@@ -139,6 +139,36 @@ function collection_theme_suggestions_collection(array $variables) {
 }
 
 /**
+ * Implements hook_entity_update().
+ *
+ * Update the name of collection items when an entity is modified.
+ */
+function collection_entity_update(EntityInterface $entity) {
+  // Don't run on collection_items.
+  if ($entity->getEntityTypeId() === 'collection_item') {
+    return;
+  }
+
+  // Don't run if entity label is unchanged.
+  if ($entity->label() === $entity->original->label()) {
+    drupal_set_message('unchanged label');
+    return;
+  }
+
+  $item_storage = \Drupal::service('entity_type.manager')->getStorage('collection_item');
+  $collection_items = $item_storage->loadByProperties([
+    'item__target_id' => $entity->id(),
+    'item__target_type' => $entity->getEntityTypeId()
+  ]);
+
+  foreach ($collection_items as $collection_item) {
+    // This should trigger CollectionItem::preSave() and update the
+    // collection_item label.
+    $collection_item->save();
+  }
+}
+
+/**
  * Implements hook_entity_predelete().
  *
  * Delete any corresponding collection items when an entity is deleted.

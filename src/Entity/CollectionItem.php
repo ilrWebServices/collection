@@ -94,13 +94,8 @@ class CollectionItem extends ContentEntityBase implements CollectionItemInterfac
       throw new \LogicException('Collection already has this entity.');
     }
 
-    // Automatically update the name of this collection item to a combination of
-    // the collection and the item.
-    $collection_label = $this->collection->entity->label();
-    $item_label = $this->item->entity->label();
-
-    // TODO: Possibly truncate this name to the length of the field.
-    $this->set('name', $collection_label . ' - ' . $item_label);
+    // Automatically update the name of this collection item to the collected item label.
+    $this->set('name', $this->item->entity->label());
   }
 
   /**
