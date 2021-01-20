@@ -271,10 +271,7 @@ class CollectionItem extends ContentEntityBase implements CollectionItemInterfac
         'type' => 'string',
         'weight' => -4,
       ])
-      ->setDisplayOptions('form', [
-        'type' => 'hidden',
-      ])
-      ->setDisplayConfigurable('form', TRUE)
+      ->setDisplayConfigurable('form', FALSE)
       ->setDisplayConfigurable('view', TRUE)
       ->setRequired(TRUE);
 
