@@ -37,3 +37,11 @@ collection.collection_item_type.*:
       sequence:
         type: string
         label: 'Bundle'
+
+views.field.collection_view_item_entity_type_label:
+  type: views_field
+  label: 'The collected item type label'
+
+views.field.collection_view_item_status:
+  type: views_field
+  label: 'The item entity status'
