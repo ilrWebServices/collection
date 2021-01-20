@@ -4,6 +4,7 @@ namespace Drupal\collection;
 
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
+use Drupal\Core\Entity\EntityPublishedInterface;
 use Drupal\Core\Form\FormBuilderInterface;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
@@ -100,7 +101,7 @@ class CollectionItemListBuilder extends BulkFormEntityListBuilder {
       '#markup' => $type
     ];
 
-    if ($entity->item->entity->getEntityType()->hasKey('status')) {
+    if ($entity->item->entity instanceof EntityPublishedInterface) {
       $published = ($entity->item->entity->isPublished()) ? 'Yes' : 'No';
     }
     else {
