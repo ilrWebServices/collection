@@ -83,9 +83,6 @@ class CollectionItemListBuilder extends BulkFormEntityListBuilder {
       '#type' => 'link',
       '#title' => $entity->item->entity->label(),
       '#url' => $entity->item->entity->toURL(),
-      '#attributes' => [
-        'class' => ['collection-item-entity-label'],
-      ],
     ];
 
     $type = $entity->item->entity->getEntityType()->getLabel();
@@ -121,41 +118,6 @@ class CollectionItemListBuilder extends BulkFormEntityListBuilder {
     ];
 
     return $row + parent::buildRow($entity);
-  }
-
-  /**
-   * {@inheritdoc}
-   *
-   * @see ModulesListForm::buildForm().
-   */
-  public function render() {
-    $build = [];
-
-    $build['filters'] = [
-      '#type' => 'container',
-      '#attributes' => [
-        'class' => ['table-filter', 'js-show'],
-      ],
-    ];
-
-    $build['filters']['text'] = [
-      '#type' => 'search',
-      '#title' => $this->t('Filter content'),
-      '#title_display' => 'invisible',
-      '#size' => 30,
-      '#placeholder' => $this->t('Filter by title'),
-      '#attributes' => [
-        'class' => ['table-filter-text'],
-        'data-table' => '#collection-item-list',
-        'autocomplete' => 'off',
-      ],
-      '#attached' => [
-        'library' => ['collection/collection.admin_filter'],
-      ],
-    ];
-
-    $build['parent_form'] = parent::render();
-    return $build;
   }
 
 }

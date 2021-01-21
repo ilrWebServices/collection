@@ -3,14 +3,3 @@ toolbar:
   css:
     theme:
       css/collection.icons.css: {}
-
-collection.admin_filter:
-  version: VERSION
-  js:
-    js/collection.admin_filter.js: {}
-  dependencies:
-    - core/jquery
-    - core/drupal
-    - core/drupal.debounce
-    - core/jquery.once
-    - core/drupal.announce
