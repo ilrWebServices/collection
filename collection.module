@@ -151,7 +151,6 @@ function collection_entity_update(EntityInterface $entity) {
 
   // Don't run if entity label is unchanged.
   if ($entity->label() === $entity->original->label()) {
-    drupal_set_message('unchanged label');
     return;
   }
 
