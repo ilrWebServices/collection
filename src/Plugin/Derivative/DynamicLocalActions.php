@@ -13,26 +13,15 @@ class DynamicLocalActions extends DeriverBase {
    * {@inheritdoc}
    */
   public function getDerivativeDefinitions($base_plugin_definition) {
-    $local_actions = [];
-
+    // Add the 'new content' action link to collection_item listings.
     // %todo: Only add if the collection allows nodes.
-    if (TRUE) {
-      $local_actions[] = [
-        'id' => 'entity.collection.add_new_content_form',
-        'title' => 'Add new content',
-        'route_name' => 'collection_item.new.node',
-      ];
-    }
-
-    foreach ($local_actions as $local_action) {
-      $this->derivatives[$local_action['id']] = $base_plugin_definition;
-      $this->derivatives[$local_action['id']]['title'] = $local_action['title'];
-      $this->derivatives[$local_action['id']]['route_name'] = $local_action['route_name'];
-      $this->derivatives[$local_action['id']]['appears_on'] = [
-        'entity.collection_item.collection',
-        'view.collection_items.page_1',
-      ];
-    }
+    $this->derivatives['entity.collection.new_content'] = $base_plugin_definition;
+    $this->derivatives['entity.collection.new_content']['title'] = 'Add new content';
+    $this->derivatives['entity.collection.new_content']['route_name'] = 'collection_item.new.node';
+    $this->derivatives['entity.collection.new_content']['appears_on'] = [
+      'entity.collection_item.collection',
+      'view.collection_items.page_1',
+    ];
 
     return parent::getDerivativeDefinitions($base_plugin_definition);
   }
