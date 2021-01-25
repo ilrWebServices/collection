@@ -111,6 +111,8 @@ class CollectionItem extends ContentEntityBase implements CollectionItemInterfac
    * {@inheritdoc}
    */
   public static function postDelete(EntityStorageInterface $storage, array $entities) {
+    static::invalidateTagsOnDelete($storage->getEntityType(), $entities);
+
     foreach ($entities as $entity) {
       if ($entity->collection->entity) {
         Cache::invalidateTags($entity->collection->entity->getCacheTagsToInvalidate());
