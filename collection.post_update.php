@@ -13,6 +13,12 @@ function collection_post_update_collection_item_labels(&$sandbox) {
   $collection_items = $item_storage->loadMultiple();
 
   foreach ($collection_items as $collection_item) {
+    // Retain the changed time value. Note the `+ 1` hack. This is because
+    // Drupal\Core\Field\Plugin\Field\FieldType\ChangedItem::preSave() has some
+    // wonky logic for automating the value to the current time.
+    $changed_time = $collection_item->getChangedTime();
+    $collection_item->setChangedTime($changed_time + 1);
+
     // This should trigger CollectionItem::preSave() and update the
     // collection_item label.
     $collection_item->save();
