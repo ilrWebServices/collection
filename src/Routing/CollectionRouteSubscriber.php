@@ -18,6 +18,9 @@ class CollectionRouteSubscriber extends RouteSubscriberBase {
       $path = $route->getPath();
 
       if ($path === '/collection/{collection}/items') {
+        // @todo Remove if https://www.drupal.org/i/2719797 lands.
+        $route->setOption('_admin_route', TRUE);
+
         //  @todo Remove if https://www.drupal.org/i/2528166 lands.
         if (!$route->getOption('parameters')) {
           $route->setOption('parameters', [
