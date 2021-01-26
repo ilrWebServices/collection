@@ -17,17 +17,21 @@ class CollectionRouteSubscriber extends RouteSubscriberBase {
     foreach ($route_collection->all() as $route) {
       $path = $route->getPath();
 
+      // Ensure that this path uses the admin theme.
+      // @todo Remove if https://www.drupal.org/i/2719797 lands.
       if ($path === '/collection/{collection}/items') {
-        // @todo Remove if https://www.drupal.org/i/2719797 lands.
-        $route->setOption('_admin_route', TRUE);
+        $route->setOption('_admin_route', 'TRUE');
+      }
 
-        //  @todo Remove if https://www.drupal.org/i/2528166 lands.
-        if (!$route->getOption('parameters')) {
-          $route->setOption('parameters', [
-            'collection' => [
-              'type' => 'entity:collection',
-            ],
-          ]);
+      // Ensure that the {collection} parameter is upcast. It may not be if
+      // this path is a View.
+      // @todo Remove if https://www.drupal.org/i/2528166 lands.
+      if (strpos($path, '{collection}') !== FALSE) {
+        $options = $route->getOptions();
+
+        if (!isset($options['parameters']['collection'])) {
+          $options['parameters']['collection']['type'] = 'entity:collection';
+          $route->setOptions($options);
         }
       }
     }
