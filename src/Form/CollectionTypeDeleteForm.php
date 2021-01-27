@@ -35,6 +35,25 @@ class CollectionTypeDeleteForm extends EntityConfirmFormBase {
   /**
    * {@inheritdoc}
    */
+  public function buildForm(array $form, FormStateInterface $form_state) {
+    $collection_count = $this->entityTypeManager->getStorage('collection')->getQuery()
+      ->condition('type', $this->entity->id())
+      ->count()
+      ->execute();
+
+    if ($collection_count) {
+      $caption = '<p>' . $this->formatPlural($collection_count, '%type is used by 1 collection on your site. You can not remove this collection type until you have removed all of the %type collections.', '%type is used by @count collections on your site. You may not remove %type until you have removed all of the %type collections.', ['%type' => $this->entity->label()]) . '</p>';
+      $form['#title'] = $this->getQuestion();
+      $form['description'] = ['#markup' => $caption];
+      return $form;
+    }
+
+    return parent::buildForm($form, $form_state);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function submitForm(array &$form, FormStateInterface $form_state) {
     $this->entity->delete();
 
