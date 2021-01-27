@@ -59,6 +59,7 @@ class CollectionLocalTasks extends DeriverBase implements ContainerDeriverInterf
       $this->derivatives['entity.collection.items']['title'] = 'Items';
       $this->derivatives['entity.collection.items']['route_name'] = $collection_item_route;
       $this->derivatives['entity.collection.items']['base_route'] = 'entity.collection.canonical';
+      $this->derivatives['entity.collection.items']['weight'] = 1;
     }
 
     return parent::getDerivativeDefinitions($base_plugin_definition);
