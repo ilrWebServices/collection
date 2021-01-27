@@ -4,7 +4,6 @@ dependencies:
   module:
     - collection
     - dynamic_entity_reference
-    - user
 id: collection_items
 label: 'Collection items'
 module: views
@@ -20,9 +19,8 @@ display:
     position: 0
     display_options:
       access:
-        type: perm
-        options:
-          perm: 'access collection overview'
+        type: collection_items_access
+        options: {  }
       cache:
         type: tag
         options: {  }
@@ -752,7 +750,6 @@ display:
         - 'languages:language_interface'
         - url
         - url.query_args
-        - user.permissions
       tags: {  }
   page_1:
     display_plugin: page
@@ -784,5 +781,4 @@ display:
         - 'languages:language_interface'
         - url
         - url.query_args
-        - user.permissions
       tags: {  }
