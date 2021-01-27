@@ -97,6 +97,8 @@ class Collection extends EditorialContentEntityBase implements CollectionInterfa
    * {@inheritdoc}
    */
   public static function postDelete(EntityStorageInterface $storage, array $entities) {
+    static::invalidateTagsOnDelete($storage->getEntityType(), $entities);
+
     // Delete the collection items of a deleted collection.
     $items_for_deletion = [];
 
