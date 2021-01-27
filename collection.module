@@ -202,7 +202,7 @@ function collection_form_alter(&$form, FormStateInterface $form_state, $form_id)
  * Add operation links to collection and collection item entities.
  */
 function collection_entity_operation(EntityInterface $entity) {
-  if ($entity->getEntityTypeId() == 'collection_item') {
+  if ($entity->getEntityTypeId() == 'collection_item' && $entity->item->entity->access('update')) {
     $item_entity_type = ($entity->item->entity instanceof \Drupal\Core\Entity\ContentEntityInterface) ? 'content' : 'configuration';
     $operations = [];
     $operations['edit_item'] = [
