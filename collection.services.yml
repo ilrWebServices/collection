@@ -14,3 +14,7 @@ services:
   collection.content_manager:
     class: Drupal\collection\CollectionContentManager
     arguments: ['@entity_type.manager']
+  collection.route_subscriber:
+    class: Drupal\collection\Routing\CollectionRouteSubscriber
+    tags:
+      - { name: event_subscriber }

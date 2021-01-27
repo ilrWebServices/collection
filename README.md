@@ -24,6 +24,7 @@ This module requires the following modules:
 - dynamic_entity_reference (https://www.drupal.org/project/dynamic_entity_reference)
 - drupal:path
 - key_value_field (https://www.drupal.org/project/key_value_field)
+- A core patch from https://www.drupal.org/project/drupal/issues/2901412
 
 ## Optional modules
 

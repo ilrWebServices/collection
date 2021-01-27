@@ -10,6 +10,7 @@ use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\Entity\BaseFieldOverride;
+use Drupal\Core\Url;
 
 /**
  * Implements hook_help().
@@ -198,7 +199,7 @@ function collection_form_alter(&$form, FormStateInterface $form_state, $form_id)
 /**
  * Implements hook_entity_operation().
  *
- * Add an operation link to edit the collection item entity.
+ * Add operation links to collection and collection item entities.
  */
 function collection_entity_operation(EntityInterface $entity) {
   if ($entity->getEntityTypeId() == 'collection_item') {
@@ -207,6 +208,22 @@ function collection_entity_operation(EntityInterface $entity) {
     $operations['edit_item'] = [
       'title' => t('Edit @entity_type', ['@entity_type' => $item_entity_type]),
       'url' => $entity->item->entity->toUrl('edit-form'),
+      'weight' => -1,
+    ];
+    return $operations;
+  }
+
+  if ($entity->getEntityTypeId() === 'collection' && $entity->access('update')) {
+    $operations = [];
+
+    $collection_items_url = Url::fromRoute(
+      'entity.collection_item.collection',
+      ['collection' => $entity->id()]
+    );
+
+    $operations['view_items'] = [
+      'title' => t('Items'),
+      'url' => $collection_items_url,
       'weight' => -1,
     ];
     return $operations;
