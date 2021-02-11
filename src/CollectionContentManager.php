@@ -67,4 +67,38 @@ class CollectionContentManager {
 
     return $collections;
   }
+
+  /**
+   * Get collection items which collect this entity.
+   *
+   * @param \Drupal\Core\Entity\EntityInterface $entity
+   *   The entity.
+   * @param string $access
+   *   The access level to check.
+   *
+   * @return array
+   *   The collections_items that collect this entity.
+   */
+  public function getCollectionItemsForEntity(EntityInterface $entity, $access = 'update') {
+    $collections_items = [];
+
+    // Load all collection items that reference this entity.
+    $collection_item_storage = $this->entityTypeManager->getStorage('collection_item');
+
+    $collection_item_ids = $collection_item_storage->getQuery()
+      ->condition('item__target_type', $entity->getEntityTypeId())
+      ->condition('item__target_id', $entity->id())
+      ->execute();
+
+    $collection_items = $collection_item_storage->loadMultiple($collection_item_ids);
+
+    foreach ($collection_items as $cid => $collection_item) {
+      if (!$collection_item->access($access)) {
+        unset($collection_items[$cid]);
+      }
+    }
+
+    return $collection_items;
+  }
+
 }
