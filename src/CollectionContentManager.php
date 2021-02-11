@@ -32,11 +32,13 @@ class CollectionContentManager {
    *
    * @param \Drupal\Core\Entity\EntityInterface $entity
    *   The entity.
+   * @param string $access
+   *   The access level to check.
    *
    * @return array
    *   The collections to which this entity belongs.
    */
-  public function getCollectionsForEntity(EntityInterface $entity) {
+  public function getCollectionsForEntity(EntityInterface $entity, $access = 'update') {
     $collections = [];
 
     // Load all collection items that reference this entity.
@@ -56,7 +58,7 @@ class CollectionContentManager {
     foreach ($collection_items as $collection_item) {
       $collection = $collection_item->collection->entity;
 
-      if (!$collection->access('update')) {
+      if (!$collection->access($access)) {
         continue;
       }
 
