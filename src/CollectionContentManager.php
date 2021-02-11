@@ -41,21 +41,7 @@ class CollectionContentManager {
   public function getCollectionsForEntity(EntityInterface $entity, $access = 'update') {
     $collections = [];
 
-    // Load all collection items that reference this entity.
-    $collection_item_storage = $this->entityTypeManager->getStorage('collection_item');
-
-    $collection_item_ids = $collection_item_storage->getQuery()
-      ->condition('item__target_type', $entity->getEntityTypeId())
-      ->condition('item__target_id', $entity->id())
-      ->execute();
-
-    $collection_items = $collection_item_storage->loadMultiple($collection_item_ids);
-
-    if (count($collection_items) === 0) {
-      return [];
-    }
-
-    foreach ($collection_items as $collection_item) {
+    foreach ($this->getCollectionItemsForEntity($entity, $access) as $collection_item) {
       $collection = $collection_item->collection->entity;
 
       if (!$collection->access($access)) {
