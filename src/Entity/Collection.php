@@ -214,7 +214,7 @@ class Collection extends EditorialContentEntityBase implements CollectionInterfa
   /**
    * {@inheritdoc}
    */
-  public function getItems() {
+  public function getItems(array $tags = []) {
     $collection_item_ids = \Drupal::entityQuery('collection_item')
       ->condition('collection', $this->id())
       ->sort('weight')

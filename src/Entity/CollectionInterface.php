@@ -68,10 +68,15 @@ interface CollectionInterface extends ContentEntityInterface, EntityChangedInter
   /**
    * Gets the collection items for this collection
    *
+   * @param array $tags
+   *   Tags to be added to the collection_item query. These can be used to
+   *   allow other modules an easy way to identify the purpose of the query
+   *   for alteration.
+   *
    * @return array
    *   A bunch of \Drupal\collection\Entity\CollectionItemInterface
    */
-  public function getItems();
+  public function getItems(array $tags = []);
 
   /**
    * Get the collection item for a given entity in this collection.
