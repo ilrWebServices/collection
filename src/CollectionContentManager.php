@@ -87,4 +87,42 @@ class CollectionContentManager {
     return $collection_items;
   }
 
+  /**
+   * Check which collections a given entity can be added to, based on the
+   * collection type configuration. This is used, for example, by the
+   * collection_request submodule.
+   *
+   * @param \Drupal\Core\Entity\EntityInterface $entity
+   *   The entity.
+   * @param string $access
+   *   The access level to check.
+   *
+   * @return array
+   *   The collections to which this entity can be added.
+   */
+  public function getAvailableCollections(EntityInterface $entity, $access = 'view') {
+    $available_collections = [];
+    $available_collection_types = [];
+    $collection_type_storage = $this->entityTypeManager->getStorage('collection_type');
+    $collection_storage = $this->entityTypeManager->getStorage('collection');
+
+    foreach ($collection_type_storage->loadMultiple() as $id => $collection_type) {
+      if (empty($collection_type->getAllowedCollectionItemTypes($entity->getEntityTypeId(), $entity->bundle()))) {
+        continue;
+      }
+
+      $collections_by_type = $collection_storage->loadByProperties([
+        'type' => $id,
+      ]);
+
+      foreach ($collections_by_type as $cid => $collection) {
+        if ($collection->access($access)) {
+          $available_collections[$cid] = $collection;
+        }
+      }
+    }
+
+    return $available_collections;
+  }
+
 }
